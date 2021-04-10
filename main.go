@@ -5,12 +5,14 @@ import (
 	"github.com/joho/godotenv"
 	"golearn/common"
 	"golearn/users"
+	"gorm.io/gorm"
 	"log"
 )
 
 func main() {
 	_ = godotenv.Load()
-	common.ConnectDatabase()
+	db := common.ConnectDatabase()
+	Migrate(db)
 	r := gin.Default()
 	v1 := r.Group("/api/v1")
 	users.Routers(v1)
@@ -18,4 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+}
+func Migrate(db *gorm.DB) {
+	users.Migrate()
 }

@@ -1,10 +1,12 @@
 package users
 
 import (
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/gin-gonic/gin"
 	"golearn/common"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -18,15 +20,15 @@ func SetContextUser(c *gin.Context, id uint) {
 	c.Set("user_id", id)
 	c.Set("user", user)
 }
-func JWTMiddleware() gin.HandlerFunc {
+func JWTMiddleware(auto401 bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		SetContextUser(c, 0)
 		token, err := request.ParseFromRequest(c.Request, &request.MultiExtractor{
 			&request.PostExtractionFilter{
 				Extractor: request.HeaderExtractor{"Authorization"},
 				Filter: func(token string) (string, error) {
-					if len(token) > 5 && strings.ToUpper(token[0:6]) == "TOKEN " {
-						return token[6:], nil
+					if len(token) > 5 && strings.ToUpper(token[0:6]) == "BEARER" {
+						return strings.TrimSpace(token[6:]), nil
 					}
 					return token, nil
 				},
@@ -37,11 +39,11 @@ func JWTMiddleware() gin.HandlerFunc {
 			return b, nil
 		})
 		if err != nil {
-
+			c.AbortWithStatusJSON(http.StatusUnauthorized, common.NewError("email", errors.New("unauthenticated user")))
 		}
 		if token != nil && token.Valid {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok {
-				userId := uint(claims["id"].(float64))
+				userId := uint(claims["user_id"].(float64))
 				SetContextUser(c, userId)
 			}
 		}
