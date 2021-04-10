@@ -40,6 +40,7 @@ func JWTMiddleware(auto401 bool) gin.HandlerFunc {
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, common.NewError("email", errors.New("unauthenticated user")))
+			return
 		}
 		if token != nil && token.Valid {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok {

@@ -38,10 +38,17 @@ func (u *User) SetLoggedTime() {
 	logged := User{LatestLoggedAt: time.Now()}
 	db.Where(&User{ID: u.ID}).Updates(logged)
 }
-func (u *User) FindOne(condition interface{}) (*User, error) {
+func FindOne(condition interface{}) (User, error) {
+	var u User
 	db := common.GetDB()
 	err := db.Where(condition).First(&u).Error
 	return u, err
+}
+
+func Update(id uint, data interface{}) error {
+	db := common.GetDB()
+	err := db.Where(&User{ID: id}).Updates(data).Error
+	return err
 }
 
 func Migrate() {
