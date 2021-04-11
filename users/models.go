@@ -34,25 +34,25 @@ func (u *User) VerifyPassword(password string) error {
 	return bcrypt.CompareHashAndPassword(hashedBytes, bytes)
 }
 func (u *User) SetLoggedTime() {
-	db := common.GetDB()
+	db := common.NewConnection()
 	logged := User{LatestLoggedAt: time.Now()}
 	db.Where(&User{ID: u.ID}).Updates(logged)
 }
 func FindOne(condition interface{}) (User, error) {
 	var u User
-	db := common.GetDB()
+	db := common.NewConnection()
 	err := db.Where(condition).First(&u).Error
 	return u, err
 }
 
 func Update(id uint, data interface{}) error {
-	db := common.GetDB()
+	db := common.NewConnection()
 	err := db.Where(&User{ID: id}).Updates(data).Error
 	return err
 }
 
 func Migrate() {
-	db := common.GetDB()
+	db := common.NewConnection()
 	err := db.AutoMigrate(&User{})
 	if err != nil {
 		fmt.Println(err.Error())

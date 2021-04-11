@@ -6,19 +6,23 @@ import (
 	"golearn/common"
 	"golearn/users"
 	"gorm.io/gorm"
-	"log"
+	"net/http"
 )
 
 func main() {
 	_ = godotenv.Load()
-	db := common.ConnectDatabase()
+	db := common.NewConnection()
 	Migrate(db)
 	r := gin.Default()
-	v1 := r.Group("/api/v1")
+	r.Use(common.Handler())
+	v1 := r.Group("api/v1")
 	users.Routers(v1)
 	err := r.Run()
 	if err != nil {
-		log.Fatal(err.Error())
+		context := &gin.Context{}
+		context.JSON(http.StatusForbidden, map[string]interface{}{
+			"message": "Oops! Something went wrong.",
+		})
 	}
 }
 func Migrate(db *gorm.DB) {

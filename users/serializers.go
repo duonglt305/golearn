@@ -33,8 +33,7 @@ type ProfileResponse struct {
 }
 
 func (p ProfileSerializer) Response() ProfileResponse {
-	id := p.c.MustGet("user_id").(uint)
-	user, _ := FindOne(&User{ID: id})
+	user := p.c.MustGet("user").(User)
 	profile := ProfileResponse{
 		Email:          user.Email,
 		Name:           user.Name,

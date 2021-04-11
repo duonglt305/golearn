@@ -13,18 +13,20 @@ type Database struct {
 
 var DB *gorm.DB
 
-func ConnectDatabase() *gorm.DB {
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                      getDataSourceName(),
-		DefaultStringSize:        255,
-		DisableDatetimePrecision: true,
-	}), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-	})
-	if err != nil {
-		println(err.Error())
+func NewConnection() *gorm.DB {
+	if DB == nil {
+		db, err := gorm.Open(mysql.New(mysql.Config{
+			DSN:                      getDataSourceName(),
+			DefaultStringSize:        255,
+			DisableDatetimePrecision: true,
+		}), &gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,
+		})
+		if err != nil {
+			println(err.Error())
+		}
+		DB = db
 	}
-	DB = db
 	return DB
 }
 
@@ -37,7 +39,4 @@ func getDataSourceName() string {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
-}
-func GetDB() *gorm.DB {
-	return DB
 }
