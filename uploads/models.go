@@ -2,20 +2,20 @@ package uploads
 
 import "golearn/common"
 
-type Folder struct {
-	ID    uint   `gorm:"column:id;primaryKey;not null"`
-	Name  string `gorm:"column:name;not null"`
-	Slug  string `gorm:"column:slug;not null"`
-	Files []File `gorm:"foreignKey:folder_id"`
+type Media struct {
+	ID       uint        `gorm:"column:id;primaryKey;not null"`
+	Name     string      `gorm:"column:name;not null"`
+	Slug     string      `gorm:"column:slug;not null"`
+	Type     int         `gorm:"column:type"`
+	Children []Media     `gorm:"foreignKey:parent_id"`
+	ParentID uint        `gorm:"parent_id"`
+	Detail   MediaDetail `gorm:"foreignKey:parent_id"`
 	common.Model
 }
-
-type File struct {
-	ID       uint    `gorm:"column:id;primaryKey;not null"`
-	Name     string  `gorm:"column:name;not null"`
-	Slug     string  `gorm:"column:slug;not null"`
-	Mimes    string  `gorm:"column:mimes"`
-	Size     float64 `gorm:"column:size"`
-	FolderID uint    `gorm:"column:folder_id"`
-	common.Model
+type MediaDetail struct {
+	ID      uint   `gorm:"column:id;primaryKey;not null"`
+	Mimes   string `gorm:"column:mimes"`
+	Size    uint   `gorm:"column:size"`
+	Path    string `gorm:"column:path"`
+	MediaID uint   `gorm:"column:media_id"`
 }

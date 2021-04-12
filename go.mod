@@ -3,7 +3,8 @@ module golearn
 go 1.16
 
 require (
-	github.com/cosmtrek/air v1.21.2 // indirect
+	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/cosmtrek/air v1.26.0 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fatih/color v1.10.0 // indirect
