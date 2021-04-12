@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Routers(r *gin.RouterGroup) {
+func Routes(r *gin.RouterGroup) {
 	auth := r.Group("auth")
 	auth.POST("login", Login)
 	auth.Use(JWTMiddleware())

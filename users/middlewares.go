@@ -14,8 +14,12 @@ func SetUserContext(c *gin.Context, id uint) {
 	c.Set("user", u)
 }
 
+func GetUserContext(c *gin.Context) *User {
+	u, _ := c.MustGet("user").(User)
+	return &u
+}
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		SetUserContext(c, common.VerifyToken(c)|0)
+		SetUserContext(c, common.VerifyToken(c))
 	}
 }
