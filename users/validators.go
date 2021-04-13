@@ -17,6 +17,7 @@ func (v *LoginValidator) Bind(c *gin.Context) error {
 	}
 	return nil
 }
+
 func NewLoginValidator() LoginValidator {
 	validator := LoginValidator{}
 	return validator

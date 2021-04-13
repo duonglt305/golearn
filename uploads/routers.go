@@ -11,7 +11,21 @@ func Routes(r *gin.RouterGroup) {
 	upload := r.Group("uploads", users.JWTMiddleware())
 	upload.GET("media", ListMedia)
 	upload.GET("media/:id", ListMedia)
-	upload.GET("media/files/:id", FileDetail)
+
+	/* Folder Routes */
+	folder := upload.Group("folders")
+	folder.POST("", CreateFolder)
+	/* File Routes */
+	file := upload.Group("files")
+	file.GET(":id", FileDetail)
+}
+
+func CreateFolder(c *gin.Context) {
+	validator := NewFolderValidator()
+	if err := validator.Bind(c); err != nil {
+		_ = c.Error(err)
+		return
+	}
 }
 
 func ListMedia(c *gin.Context) {
@@ -33,6 +47,7 @@ func ListMedia(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, serializer.Response())
 }
+
 func FileDetail(c *gin.Context) {
 	id, exists := c.Params.Get("id")
 	if exists {

@@ -37,6 +37,10 @@ type MediaDetail struct {
 func ListMyMediaByParent(id uint, parent uint, c *gin.Context, media *[]MediaItem) (error, *common.Pagination) {
 	db := common.NewConnection()
 	p := common.NewPagination()
-	err := db.Where(&MediaItem{OwnerID: id}).Where("parent_id = ?", parent).Scopes(common.Paginate(c, p)).Find(media).Error
+	err := db.Where(
+		&MediaItem{OwnerID: id},
+	).Where("parent_id = ?", parent).Scopes(
+		common.Paginate(c, p),
+	).Find(media).Error
 	return err, p
 }
