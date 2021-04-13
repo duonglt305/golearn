@@ -2,22 +2,19 @@ package uploads
 
 import (
 	"github.com/gin-gonic/gin"
+	"golearn/common"
 	"time"
 )
 
 type ListMediaSerializer struct {
-	Context *gin.Context `json:"-"`
-	Media   []Media
+	Context    *gin.Context `json:"-"`
+	Media      []MediaItem
+	Pagination *common.Pagination
 }
 
 type ListMediaResponse struct {
-	Data        []MediaResponse `json:"data"`
-	From        int             `json:"from"`
-	To          int             `json:"to"`
-	CurrentPage int             `json:"current_page"`
-	LastPage    int             `json:"last_page"`
-	PerPage     int             `json:"per_page"`
-	Total       int             `json:"total"`
+	common.PaginationResponse
+	Data []interface{} `json:"data"`
 }
 
 type MediaResponse struct {
@@ -28,26 +25,44 @@ type MediaResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+type FileResponse struct {
+	MediaResponse
+	Mimes string `json:"mimes"`
+	Size  uint   `json:"size"`
+	Path  string `json:"path"`
+}
 
-func (s ListMediaSerializer) Response() ListMediaResponse {
+func (s *ListMediaSerializer) Response() ListMediaResponse {
 	resp := ListMediaResponse{
-		Data:        nil,
-		CurrentPage: 0,
-		LastPage:    0,
-		Total:       0,
+		Data: nil,
+		PaginationResponse: common.PaginationResponse{
+			From:        s.Pagination.From(),
+			To:          s.Pagination.To(),
+			CurrentPage: s.Pagination.CurrentPage,
+			LastPage:    s.Pagination.LastPage(),
+			PerPage:     s.Pagination.PerPage,
+			Total:       s.Pagination.Total,
+		},
 	}
 	for _, media := range s.Media {
-		resp.Data = append(
-			resp.Data,
-			MediaResponse{
-				ID:        media.ID,
-				Name:      media.Name,
-				Slug:      media.Slug,
-				ParentID:  media.ParentID,
-				CreatedAt: media.CreatedAt,
-				UpdatedAt: media.CreatedAt,
-			},
-		)
+		var m interface{}
+		m = MediaResponse{
+			ID:        media.ID,
+			Name:      media.Name,
+			Slug:      media.Slug,
+			ParentID:  media.ParentID,
+			CreatedAt: media.CreatedAt,
+			UpdatedAt: media.CreatedAt,
+		}
+		if media.Type == File {
+			m = FileResponse{
+				MediaResponse: m.(MediaResponse),
+				Mimes:         "",
+				Size:          0,
+				Path:          "",
+			}
+		}
+		resp.Data = append(resp.Data, m)
 	}
 	return resp
 }

@@ -14,7 +14,7 @@ type User struct {
 	Name           string    `gorm:"column:name;not null"`
 	Password       string    `gorm:"column:password;size:255;not null"`
 	Photo          string    `gorm:"column:photo"`
-	LatestLoggedAt time.Time `gorm:"column:latest_logged_at"`
+	LatestLoggedAt time.Time `gorm:"column:latest_logged_at;default:null"`
 	common.Model
 }
 

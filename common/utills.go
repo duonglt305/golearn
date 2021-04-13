@@ -5,9 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 	"math/rand"
-	"strconv"
 	"strings"
 )
 
@@ -40,21 +38,4 @@ func GetValidationMessages(err error) ValidationErrorMessages {
 		}
 	}
 	return vErrors
-}
-
-func Pagination(c *gin.Context) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		page, _ := strconv.Atoi(c.Query("page"))
-		if page == 0 {
-			page = 1
-		}
-		limit, _ := strconv.Atoi(c.Query("limit"))
-		if limit > 100 {
-			limit = 100
-		} else if limit <= 0 {
-			limit = 15
-		}
-		offset := (page - 1) * limit
-		return db.Offset(offset).Limit(limit)
-	}
 }

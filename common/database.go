@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"golearn/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"os"
@@ -26,6 +27,9 @@ func NewConnection() *gorm.DB {
 			println(err.Error())
 		}
 		DB = db
+		if config.Config.Debug {
+			DB = DB.Debug()
+		}
 	}
 	return DB
 }
