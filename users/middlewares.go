@@ -2,7 +2,6 @@ package users
 
 import (
 	"github.com/gin-gonic/gin"
-	"golearn/common"
 )
 
 func SetUserContext(c *gin.Context, id uint) {
@@ -19,7 +18,5 @@ func GetUserContext(c *gin.Context) *User {
 	return &u
 }
 func JWTMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		SetUserContext(c, common.VerifyToken(c))
-	}
+	return VerifyToken
 }

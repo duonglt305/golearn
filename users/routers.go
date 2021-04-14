@@ -19,25 +19,24 @@ func ProfileRetrieve(c *gin.Context) {
 }
 
 func ProfileUpdate(c *gin.Context) {
-	validator := ProfileValidator{}
-	if err := validator.Bind(c); err != nil {
+	v, err := NewProfileValidator(c)
+	if err != nil {
 		return
 	}
 	u := c.MustGet("user").(User)
-	_ = Update(u.ID, validator.User)
+	_ = Update(u.ID, v.User)
 	SetUserContext(c, u.ID)
 	serializer := ProfileSerializer{c}
 	c.JSON(http.StatusOK, serializer.Response())
 }
 
 func Login(c *gin.Context) {
-	validator := NewLoginValidator()
-	if err := validator.Bind(c); err != nil {
-		_ = c.Error(err)
+	v, err := NewLoginValidator(c)
+	if err != nil {
 		return
 	}
-	u, err := FindOne(&User{Email: validator.Email})
-	if err == nil && u.VerifyPassword(validator.Password) == nil {
+	u, err := FindOne(&User{Email: v.Email})
+	if err == nil && u.VerifyPassword(v.Password) == nil {
 		SetUserContext(c, u.ID)
 		u.SetLoggedTime()
 		serializer := LoginSerializer{c}

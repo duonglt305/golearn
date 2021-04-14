@@ -1,26 +1,19 @@
 package users
 
-import (
-	"github.com/gin-gonic/gin"
-	"golearn/common"
-)
+import "github.com/gin-gonic/gin"
 
 type LoginValidator struct {
-	Email    string `form:"email" json:"email" binding:"email"`
-	Password string `form:"password" json:"password" binding:"min=8,max=255"`
+	Email    string `form:"email" json:"email" binding:"required,email"`
+	Password string `form:"password" json:"password" binding:"required,min=8,max=255"`
 }
 
-func (v *LoginValidator) Bind(c *gin.Context) error {
-	err := common.Bind(c, v)
-	if err != nil {
-		return err
+func NewLoginValidator(c *gin.Context) (*LoginValidator, error) {
+	v := &LoginValidator{}
+	if err := c.ShouldBind(v); err != nil {
+		_ = c.Error(err)
+		return v, err
 	}
-	return nil
-}
-
-func NewLoginValidator() LoginValidator {
-	validator := LoginValidator{}
-	return validator
+	return v, nil
 }
 
 type ProfileValidator struct {
@@ -28,12 +21,12 @@ type ProfileValidator struct {
 	User User   `json:"-"`
 }
 
-func (v *ProfileValidator) Bind(c *gin.Context) error {
-	err := common.Bind(c, v)
-	if err != nil {
+func NewProfileValidator(c *gin.Context) (*ProfileValidator, error) {
+	v := &ProfileValidator{}
+	if err := c.ShouldBind(v); err != nil {
 		_ = c.Error(err)
-		return err
+		return v, err
 	}
 	v.User.Name = v.Name
-	return nil
+	return v, nil
 }

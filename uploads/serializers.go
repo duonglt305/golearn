@@ -20,11 +20,12 @@ type ListMediaResponse struct {
 type MediaResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
-	Slug      string    `json:"slug"`
 	ParentID  uint      `json:"parent_id"`
+	OwnerID   uint      `json:"owner_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
 type FileResponse struct {
 	MediaResponse
 	Mimes string `json:"mimes"`
@@ -49,7 +50,6 @@ func (s *ListMediaSerializer) Response() ListMediaResponse {
 		m = MediaResponse{
 			ID:        media.ID,
 			Name:      media.Name,
-			Slug:      media.Slug,
 			ParentID:  media.ParentID,
 			CreatedAt: media.CreatedAt,
 			UpdatedAt: media.CreatedAt,
@@ -65,4 +65,20 @@ func (s *ListMediaSerializer) Response() ListMediaResponse {
 		resp.Data = append(resp.Data, m)
 	}
 	return resp
+}
+
+type MediaItemSerializer struct {
+	Context   *gin.Context `json:"-"`
+	MediaItem MediaItem
+}
+
+func (s *MediaItemSerializer) Response() *MediaResponse {
+	return &MediaResponse{
+		ID:        s.MediaItem.ID,
+		Name:      s.MediaItem.Name,
+		ParentID:  s.MediaItem.ParentID,
+		OwnerID:   s.MediaItem.OwnerID,
+		CreatedAt: s.MediaItem.CreatedAt,
+		UpdatedAt: s.MediaItem.UpdatedAt,
+	}
 }

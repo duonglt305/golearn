@@ -2,8 +2,6 @@ package common
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"math/rand"
 	"strings"
@@ -17,11 +15,6 @@ func RandString(length int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
-}
-
-func Bind(c *gin.Context, obj interface{}) error {
-	b := binding.Default(c.Request.Method, c.ContentType())
-	return c.ShouldBindWith(obj, b)
 }
 
 type ValidationErrorMessages map[string]interface{}

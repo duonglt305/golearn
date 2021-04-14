@@ -2,22 +2,25 @@ package uploads
 
 import (
 	"github.com/gin-gonic/gin"
-	"golearn/common"
+	"golearn/users"
 )
 
 type FolderValidator struct {
-	Name     string `form:"name" json:"name" binding:"required,max=50"`
-	FolderID uint   `form:"folder_id" json:"folder_id" binding:"omitempty"`
+	Name      string    `form:"name" json:"name" binding:"required,max=50"`
+	FolderID  uint      `form:"folder_id" json:"folder_id" binding:"omitempty"`
+	MediaItem MediaItem `json:"-"`
 }
 
-func NewFolderValidator() *FolderValidator {
+func NewFolderValidator(c *gin.Context) (*FolderValidator, error) {
+	u := users.GetUserContext(c)
 	v := &FolderValidator{}
-	return v
-}
-func (v *FolderValidator) Bind(c *gin.Context) error {
-	err := common.Bind(c, v)
-	if err != nil {
-		return err
+	if err := c.ShouldBind(v); err != nil {
+		_ = c.Error(err)
+		return v, err
 	}
-	return nil
+	v.MediaItem.Name = v.Name
+	v.MediaItem.ParentID = v.FolderID
+	v.MediaItem.Type = Folder
+	v.MediaItem.OwnerID = u.ID
+	return v, nil
 }

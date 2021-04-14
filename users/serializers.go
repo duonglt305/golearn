@@ -2,7 +2,6 @@ package users
 
 import (
 	"github.com/gin-gonic/gin"
-	"golearn/common"
 	"time"
 )
 
@@ -16,7 +15,7 @@ type LoginResponse struct {
 func (serializer *LoginSerializer) Response() LoginResponse {
 	u := serializer.c.MustGet("user_id").(uint)
 	user := LoginResponse{
-		AccessToken: common.GenToken(u),
+		AccessToken: GenToken(u),
 	}
 	return user
 }

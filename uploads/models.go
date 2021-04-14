@@ -16,7 +16,6 @@ const (
 type MediaItem struct {
 	ID       uint        `gorm:"column:id;primaryKey;not null"`
 	Name     string      `gorm:"column:name;not null"`
-	Slug     string      `gorm:"column:slug;not null"`
 	Type     Type        `gorm:"column:type;default:1"`
 	ParentID uint        `gorm:"column:parent_id;default:0"`
 	OwnerID  uint        `gorm:"column:owner_id;not null"`
@@ -43,4 +42,9 @@ func ListMyMediaByParent(id uint, parent uint, c *gin.Context, media *[]MediaIte
 		common.Paginate(c, p),
 	).Find(media).Error
 	return err, p
+}
+
+func CreateMediaItem(m *MediaItem) error {
+	db := common.NewConnection()
+	return db.Create(m).Error
 }

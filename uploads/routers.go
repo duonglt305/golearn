@@ -21,11 +21,16 @@ func Routes(r *gin.RouterGroup) {
 }
 
 func CreateFolder(c *gin.Context) {
-	validator := NewFolderValidator()
-	if err := validator.Bind(c); err != nil {
+	v, vErr := NewFolderValidator(c)
+	if vErr != nil {
+		return
+	}
+	if err := CreateMediaItem(&v.MediaItem); err != nil {
 		_ = c.Error(err)
 		return
 	}
+	s := MediaItemSerializer{Context: c, MediaItem: v.MediaItem}
+	c.JSON(http.StatusOK, s.Response())
 }
 
 func ListMedia(c *gin.Context) {

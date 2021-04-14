@@ -51,20 +51,22 @@ func NewValidationError(err error) *ValidationError {
 func Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
-		errors := c.Errors.ByType(gin.ErrorTypeAny)
-		if len(errors) > 0 {
+		if len(c.Errors) > 0 {
+			errors := c.Errors.ByType(gin.ErrorTypeAny)
 			err := errors[0].Err
 			switch err.(type) {
 			case *GenericError:
 				parsed := err.(*GenericError)
-				c.IndentedJSON(parsed.Code, parsed)
+				c.AbortWithStatusJSON(parsed.Code, parsed)
 			case validator.ValidationErrors:
 				parsed := NewValidationError(err)
-				c.IndentedJSON(parsed.Code, parsed)
+				c.AbortWithStatusJSON(parsed.Code, parsed)
 			default:
 				parsed := NewGenericError(err)
-				c.IndentedJSON(parsed.Code, parsed)
+				c.AbortWithStatusJSON(parsed.Code, parsed)
 			}
+			return
 		}
+
 	}
 }

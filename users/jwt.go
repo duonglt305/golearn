@@ -1,11 +1,11 @@
-package common
+package users
 
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	"github.com/gin-gonic/gin"
-	"os"
-	"strconv"
+	"golearn/common"
+	"golearn/config"
 	"strings"
 	"time"
 )
@@ -16,21 +16,20 @@ type JwtClaims struct {
 }
 
 func GenToken(id uint) string {
-	lifetime, _ := strconv.Atoi(os.Getenv("JWT_LIFETIME"))
 	now := time.Now().UTC()
 	claims := &JwtClaims{
 		ID: id,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: now.Add(time.Hour * time.Duration(lifetime)).Unix(),
+			ExpiresAt: now.Add(time.Hour * time.Duration(config.Config.Jwt.LifeTime)).Unix(),
 			NotBefore: now.Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, _ := token.SignedString([]byte(os.Getenv("APP_KEY")))
+	signedToken, _ := token.SignedString([]byte(config.Config.Key))
 	return signedToken
 }
 
-func VerifyToken(c *gin.Context) uint {
+func VerifyToken(c *gin.Context) {
 	token, err := request.ParseFromRequest(c.Request, &request.MultiExtractor{
 		&request.PostExtractionFilter{
 			Extractor: request.HeaderExtractor{"Authorization"},
@@ -43,16 +42,17 @@ func VerifyToken(c *gin.Context) uint {
 		},
 		request.ArgumentExtractor{"access_token"},
 	}, func(token *jwt.Token) (interface{}, error) {
-		b := []byte(os.Getenv("APP_KEY"))
+		b := []byte(config.Config.Key)
 		return b, nil
 	}, request.WithClaims(&JwtClaims{}))
 	if err != nil {
-		_ = c.Error(NewUnauthenticatedError(err))
-		c.Abort()
+		_ = c.Error(common.NewUnauthenticatedError(err))
+		return
 	}
+	var uid uint = 0
 	if token != nil && token.Valid {
 		claims := token.Claims.(*JwtClaims)
-		return claims.ID
+		uid = claims.ID
 	}
-	return 0
+	SetUserContext(c, uid)
 }
